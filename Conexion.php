@@ -1,10 +1,11 @@
 <?php
 
+require_once "global.php";
 class Conexion {
-    private $host = "localhost:3308";
-    private $usuario = "James";
-    private $contrasena = "erp94128";
-    private $nombreBD = "GameStation";
+    private $host = DB_Host.":".DB_Puerto;
+    private $usuario = DB_Usuario;
+    private $contrasena = DB_Contrasena;
+    private $nombreBD = DB_BaseDeDatos;
     private $conexion;
 
     public function __construct() {

@@ -1,8 +1,11 @@
 <?php
-$servername = "localhost:3308";
-$username = "James";
-$password = "erp94128";
-$database = "GameStation";
+require_once "global.php";
+
+$servername = DB_Host . ":" . DB_Puerto;
+$username = DB_Usuario;
+$password = DB_Contrasena;
+$database = DB_BaseDeDatos;
+
 
 $conn = mysqli_connect($servername, $username, $password, $database);
 
