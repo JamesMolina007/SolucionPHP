@@ -33,5 +33,11 @@ class Videojuegos {
         $query = "DELETE FROM videojuegos WHERE id=$id";
         return $this->conexion->query($query);
     }
+	
+	public function eliminarVideojuegos($ids) {
+        foreach ($ids as $id) {
+            $this->eliminarVideojuego($id);
+        }
+    }
 }
 ?>
