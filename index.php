@@ -180,6 +180,47 @@
 					$('#precio').val('');
 				});
 
+				$(document).on('click', '.btn-editar', function(e) {
+					e.preventDefault();
+					var id = $(this).data('id');
+					$.ajax({
+						url: 'obtener_videojuego.php',
+						method: 'GET',
+						data: { id: id },
+						dataType: 'json',
+						success: function(response) {
+							$('#id').val(response.id);
+							$('#nombre').val(response.nombre);
+							$('#categoria').val(response.categoria);
+							$('#dificultad').val(response.dificultad);
+							$('#lanzamiento').val(response.anioLanzamiento);
+							$('#precio').val(response.precio);
+							$('#adminJuego').modal('show');
+						}
+					});
+				});
+
+				$(document).on('click', '.btn-eliminar', function(e){
+					e.preventDefault();
+					var id = $(this).data('id');
+					if(confirm('¿Estás seguro de eliminar el videojuego?')){
+						$.ajax({
+							url: 'eliminar_videojuego.php',
+							method: 'POST',
+							data: { id: id },
+							dataType: 'json',
+							success: function(response) {
+								if (response.error) {
+									alert(response.mensaje);
+								} else {
+									obtenerVideojuegos(paginaActual);
+								}
+							}
+						});
+					}
+				})
+
+
 				$('#guardarVideojuego').click(function(e) {
 					e.preventDefault();
 					var id = $('#id').val();
