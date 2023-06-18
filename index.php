@@ -251,7 +251,50 @@
 						}
 					});
 				});
+				
+				$(document).on('change', '#check-all', function() {
+					if ($(this).prop('checked')) {
+						$('#btn-eliminar').prop('disabled', false);
+					} else {
+						$('#btn-eliminar').prop('disabled', true);
+					}
+					$('.check-item').prop('checked', $(this).prop('checked'));
+				});
 
+				$(document).on('change', '.check-item', function() {
+					if ($('.check-item:checked').length > 0) {
+						$('#btn-eliminar').prop('disabled', false);
+					} else {
+						$('#btn-eliminar').prop('disabled', true);
+					}
+				});
+
+				$('#btn-eliminar').click(function(e) {
+					e.preventDefault();
+					if (confirm('¿Estás seguro de eliminar los videojuegos seleccionados?')) {
+						var ids = [];
+						$('.check-item:checked').each(function(e) {
+							ids.push($(this).data('id'));
+						});
+						if (ids.length > 0) {
+							$.ajax({
+								url: 'eliminar_videojuegos.php',
+								method: 'POST',
+								data: { ids: ids },
+								dataType: 'json',
+								success: function(response) {
+									if (response.error) {
+										alert(response.mensaje);
+									} else {
+										obtenerVideojuegos(paginaActual);
+										$('#check-all').prop('checked', false);
+										$('#btn-eliminar').prop('disabled', true);
+									}
+								}
+							});
+						}
+					}
+				});
 						
 			});
 		</script>
