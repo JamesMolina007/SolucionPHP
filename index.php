@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 	<head>
 		<meta charset="UTF-8">
@@ -170,6 +169,46 @@
 								paginaActual = pagina;
 								obtenerVideojuegos(pagina);
 							}
+				});
+				
+				$('#adminJuego').on('hidden.bs.modal', function() {
+					$('#id').val('');
+					$('#nombre').val('');
+					$('#categoria').val('Aventura');
+					$('#dificultad').val('Facil');
+					$('#lanzamiento').val('');
+					$('#precio').val('');
+				});
+
+				$('#guardarVideojuego').click(function(e) {
+					e.preventDefault();
+					var id = $('#id').val();
+					var nombre = $('#nombre').val();
+					var categoria = $('#categoria').val();
+					var dificultad = $('#dificultad').val();
+					var lanzamiento = $('#lanzamiento').val();
+					var precio = $('#precio').val();
+					$.ajax({
+						url: 'guardar_videojuego.php',
+						method: 'POST',
+						data: {
+							id: id,
+							nombre: nombre,
+							categoria: categoria,
+							dificultad: dificultad,
+							lanzamiento: lanzamiento,
+							precio: precio
+						},
+						dataType: 'json',
+						success: function(response) {
+							if (response.error) {
+								alert(response.mensaje);
+							} else {
+								$('#adminJuego').modal('hide');
+								obtenerVideojuegos(paginaActual);
+							}
+						}
+					});
 				});
 
 						
