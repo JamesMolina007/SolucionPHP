@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 	<head>
 		<meta charset="UTF-8">
@@ -101,6 +102,79 @@
 				</div>
 			</div>
 		</div>		
+		<script>
+    		$(document).ready(function() {
+        		var paginaActual = 1;
+        		obtenerVideojuegos(paginaActual);
+
+				function obtenerVideojuegos(pagina) {
+					$('.spinner-border').show();
+					$.ajax({
+						url: 'cargar_datos.php',
+						method: 'GET',
+						data: { 
+							pagina: pagina,
+							busqueda: $('#busqueda').val()
+						},
+						dataType: 'json',
+						success: function(response) {
+							$('#tabla-videojuegos').html(response.tabla);
+							actualizarPaginacion(response.totalPaginas, pagina);
+							$('.spinner-border').hide();
+						}
+					});
+				}
+
+				$('#busqueda').keyup(function() {
+					obtenerVideojuegos(paginaActual);
+				});
+				
+				function actualizarPaginacion(totalPaginas, paginaActual) {
+					var paginacion = $('#paginacion');
+					paginacion.empty();
+					if (paginaActual > 1)
+						paginacion.append('<li class="page-item"><a class="page-link" href="#" data-pagina="' + (paginaActual - 1) + '">&lt;</a></li>');
+					else
+						paginacion.append('<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>');
+					if(paginaActual == 1)
+						paginacion.append('<li class="page-item active"><a class="page-link" href="#" data-pagina="1">1</a></li>');
+					else
+						paginacion.append('<li class="page-item"><a class="page-link" href="#" data-pagina="1">1</a></li>');
+					var inicio = Math.max(2, paginaActual - 2);
+					var fin = Math.min(totalPaginas - 1, paginaActual + 2);
+					if (inicio > 2)
+						paginacion.append('<li class="page-item disabled"><a class="page-link" href="#">...</a></li>');
+					for (var i = inicio; i <= fin; i++) {
+						var claseActiva = (i === paginaActual) ? 'active' : '';
+						paginacion.append('<li class="page-item ' + claseActiva + '"><a class="page-link" href="#" data-pagina="' + i + '">' + i + '</a></li>');
+					}
+					if (fin < totalPaginas - 1) 
+						paginacion.append('<li class="page-item disabled"><a class="page-link" href="#">...</a></li>');
+					
+					if(paginaActual == totalPaginas)
+						paginacion.append('<li class="page-item active"><a class="page-link" href="#" data-pagina="' + totalPaginas + '">' + totalPaginas + '</a></li>');
+					else
+						paginacion.append('<li class="page-item"><a class="page-link" href="#" data-pagina="' + totalPaginas + '">' + totalPaginas + '</a></li>');
+					
+					if (paginaActual < totalPaginas)
+						paginacion.append('<li class="page-item"><a class="page-link" href="#" data-pagina="' + (paginaActual + 1) + '">&gt;</a></li>');
+					else
+						paginacion.append('<li class="page-item disabled"><a class="page-link" href="#">&gt;</a></li>');
+					
+				}
+				
+				$(document).on('click', '.pagination .page-link', function(e) {
+							e.preventDefault();
+							var pagina = parseInt($(this).data('pagina'));
+							if (!isNaN(pagina)) {
+								paginaActual = pagina;
+								obtenerVideojuegos(pagina);
+							}
+				});
+
+						
+			});
+		</script>
 		<?php
 		?>
 	</body>
