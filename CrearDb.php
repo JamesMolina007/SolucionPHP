@@ -6,7 +6,6 @@ $username = DB_Usuario;
 $password = DB_Contrasena;
 $database = DB_BaseDeDatos;
 
-
 $conn = mysqli_connect($servername, $username, $password, $database);
 
 if (!$conn) {
@@ -15,20 +14,17 @@ if (!$conn) {
 
 $tabla = "videojuegos";
 
-// Verificar si la tabla existe
 $sql = "SHOW TABLES LIKE '$tabla'";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {
-    // La tabla existe, vaciarla
     $sql = "TRUNCATE TABLE $tabla";
     if (mysqli_query($conn, $sql)) {
-        echo "La tabla '$tabla' ha sido vaciada correctamente.";
+        echo "La tabla '$tabla' ha sido vaciada correctamente.<br>";
     } else {
         echo "Error al vaciar la tabla '$tabla': " . mysqli_error($conn);
     }
 } else {
-    // La tabla no existe, crearla
     $sql = "CREATE TABLE $tabla (
         id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(50),
@@ -39,14 +35,16 @@ if (mysqli_num_rows($result) > 0) {
     )";
 
     if (mysqli_query($conn, $sql)) {
-        echo "La tabla '$tabla' ha sido creada correctamente.";
+        echo "La tabla '$tabla' ha sido creada correctamente.<br>";
     } else {
         echo "Error al crear la tabla '$tabla': " . mysqli_error($conn);
     }
 }
 
-// Generar y llenar 300,000 registros
+
 $registros = 300000;
+$lotes = ceil($registros / 10000);
+$registrosPorLote = 10000;
 
 $categorias = ["Accion", "Aventura", "Estrategia", "Deportes", "RPG", "Disparos", "Rol", "Simulacion", "Otros"];
 $dificultades = ["Facil", "Normal", "Dificil", "Extremo"];
@@ -54,21 +52,36 @@ $dificultades = ["Facil", "Normal", "Dificil", "Extremo"];
 $preciosMin = 10;
 $preciosMax = 100;
 
-for ($i = 1; $i <= $registros; $i++) {
-    $nombre = "Videojuego " . $i;
-    $categoria = $categorias[array_rand($categorias)];
-    $dificultad = $dificultades[array_rand($dificultades)];
-    $anioLanzamiento = rand(1980, 2023);
-    $precio = rand($preciosMin * 100, $preciosMax * 100) / 100;
+$registrosInsertados = 0;
 
-    $sql = "INSERT INTO $tabla (nombre, categoria, dificultad, anio_lanzamiento, precio) VALUES ('$nombre', '$categoria', '$dificultad', $anioLanzamiento, $precio)";
+for ($loteActual = 1; $loteActual <= $lotes; $loteActual++) {
+    $valores = "";
+
+    for ($i = 0; $i < $registrosPorLote && $registrosInsertados < $registros; $i++) {
+        $nombre = "Videojuego " . ($registrosInsertados + 1);
+        $categoria = $categorias[array_rand($categorias)];
+        $dificultad = $dificultades[array_rand($dificultades)];
+        $anioLanzamiento = rand(1980, 2023);
+        $precio = rand($preciosMin * 100, $preciosMax * 100) / 100;
+
+        $valores .= "('$nombre', '$categoria', '$dificultad', $anioLanzamiento, $precio),";
+        $registrosInsertados++;
+    }
+    $valores = rtrim($valores, ",");
+
+    $sql = "INSERT INTO $tabla (nombre, categoria, dificultad, anio_lanzamiento, precio) VALUES $valores";
 
     if (!mysqli_query($conn, $sql)) {
-        echo "Error al insertar el registro número $i: " . mysqli_error($conn);
+        echo "Error al insertar los registros del lote $loteActual: " . mysqli_error($conn) . "<br>";
+    } else {
+        echo "Se han insertado " . mysqli_affected_rows($conn) . " registros en el lote $loteActual <br>";
+    }
+
+    if ($loteActual === $lotes) {
+        echo "Se han insertado todos los registros en la tabla.<br>";
     }
 }
 
-echo "Se han insertado $registros registros en la tabla '$tabla'.";
-
 mysqli_close($conn);
+
 ?>
